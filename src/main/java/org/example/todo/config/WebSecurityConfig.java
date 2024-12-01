@@ -1,6 +1,6 @@
 package org.example.todo.config;
 
-import org.example.todo.service.UserDetailService;
+import org.example.todo.service.user.UserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,7 +9,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -27,7 +26,8 @@ public class WebSecurityConfig {
         .formLogin(formlogin -> formlogin
             // html에 쓰인 input field의 name 값과 usernameParameter 명이 맞아야 loadUserByUsername()
             // method에 올바르게 argument가 전달됨
-            .usernameParameter("userEmail")
+            .usernameParameter("email")
+            .loginProcessingUrl("/login")
             .defaultSuccessUrl("/main")
             .loginPage("/login"))
         .logout(logout -> logout

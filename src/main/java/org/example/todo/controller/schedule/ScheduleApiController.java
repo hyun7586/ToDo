@@ -1,14 +1,12 @@
 package org.example.todo.controller.schedule;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.example.todo.domain.ScheduleEntity;
 import org.example.todo.dto.schedule.ScheduleAddRequest;
 import org.example.todo.dto.schedule.ScheduleUpdateRequest;
 import org.example.todo.dto.schedule.ScheduleViewResponse;
-import org.example.todo.service.ScheduleService;
+import org.example.todo.service.schedule.ScheduleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
