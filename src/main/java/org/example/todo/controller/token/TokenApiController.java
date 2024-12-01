@@ -3,7 +3,7 @@ package org.example.todo.controller.token;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.dto.token.CreateAccessTokenRequest;
 import org.example.todo.dto.token.CreateAccessTokenResponse;
-import org.example.todo.service.TokenService;
+import org.example.todo.service.token.TokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
