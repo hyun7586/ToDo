@@ -4,13 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.dto.user.UserAddRequest;
-import org.example.todo.service.UserService;
+import org.example.todo.service.user.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,15 +21,16 @@ public class UserLoginController {
   // login, signup, logout
   @PostMapping("/signup")
   public String signUpUser(
-      @RequestBody UserAddRequest request
+      @RequestParam String email,
+      @RequestParam String password
   ) {
-    userService.save(request);
+    userService.save(UserAddRequest.builder()
+        .userEmail(email)
+        .userPassword(password)
+        .build());
 
     return "redirect:/login";
   }
-
-  // login은 api 따로 구현하지 않아도 됨.
-  // WebSecurityConfig에서 formlogin 설정을 해 놨으면 security가 알아서 login 처리함
 
   @GetMapping("/logout")
   public String logout(HttpServletRequest request, HttpServletResponse response) {
