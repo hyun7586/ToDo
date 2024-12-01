@@ -1,4 +1,4 @@
-package org.example.todo.service;
+package org.example.todo.service.token;
 
 import lombok.RequiredArgsConstructor;
 import org.example.todo.domain.RefreshToken;

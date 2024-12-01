@@ -1,4 +1,4 @@
-package org.example.todo.service;
+package org.example.todo.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

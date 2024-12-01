@@ -1,4 +1,4 @@
-package org.example.todo.service;
+package org.example.todo.service.schedule;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;

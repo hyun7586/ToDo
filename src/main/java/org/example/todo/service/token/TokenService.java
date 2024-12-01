@@ -1,9 +1,10 @@
-package org.example.todo.service;
+package org.example.todo.service.token;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.config.jwt.TokenProvider;
 import org.example.todo.domain.UserEntity;
+import org.example.todo.service.user.UserService;
 import org.springframework.stereotype.Service;
 
 @Service
