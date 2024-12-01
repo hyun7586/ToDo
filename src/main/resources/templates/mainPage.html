@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+  <title>To-Do List</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    .filter-buttons button {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+<h1>To-Do List</h1>
+
+<!-- 정렬 기준 필터 -->
+<div class="filter-buttons">
+  <button th:onclick="window.location='@{/todos?filter=today}'"> ~ TODAY</button>
+  <button th:onclick="window.location='@{/todos?filter=this-week}'"> ~ THIS WEEK</button>
+  <button th:onclick="window.location='@{/todos?filter=this-month}'"> ~ THIS MONTH</button>
+</div>
+
+<br>
+<br>
+
+<!-- 할 일 리스트 -->
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Deadline</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="todo : ${todos}">
+    <td th:text="${todo.id}"></td>
+    <td>
+      <!-- 할 일 클릭 시 세부 페이지로 이동 -->
+      <a th:href="@{/todos/details/{id}(id=${todo.id})}" th:text="${todo.title}"></a>
+    </td>
+    <td th:text="${todo.description}"></td>
+    <td th:text="${#temporals.format(todo.deadline, 'yyyy-MM-dd')}"></td>
+    <td th:text="${todo.completed ? 'Yes' : 'No'}"></td>
+  </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
