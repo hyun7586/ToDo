@@ -4,25 +4,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.example.todo.domain.UserEntity;
 import org.example.todo.dto.user.UserAddRequest;
-import org.example.todo.dto.user.UserLoginRequest;
 import org.example.todo.dto.user.UserResponse;
 import org.example.todo.dto.user.UserUpdateRequest;
 import org.example.todo.repository.UserRepository;
-import org.example.todo.service.UserService;
+import org.example.todo.service.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -119,21 +112,5 @@ public class UserApiController {
   }
 
 
-  // for admin, modify DB, logic ... etc
-  // this address doesn't need to be authenticated, it's permitted all.
-
-  // this is for encoding user's password(using BCryptPasswordEncoder)(completed)
-  @PatchMapping("/modify_for_admin")
-  @Transactional
-  public List<UserEntity> modify() {
-    List<UserEntity> target = userRepository.findAll();
-
-    target.forEach(each->{
-      each.setUserPassword(bCryptPasswordEncoder.encode(each.getUserPassword()));
-      userRepository.save(each);
-    });
-
-    return userRepository.findAll();
-  }
 
 }
