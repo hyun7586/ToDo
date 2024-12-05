@@ -21,16 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/schedule/api")
-public class ScheduleApiController {
+public class ScheduleApiController implements ScheduleApiSpec{
 
   private final ScheduleService scheduleService;
-
-  // test api
-  @GetMapping("/test")
-  public ResponseEntity<?> getTest(){
-    return ResponseEntity.status(HttpStatus.OK)
-        .body("get method is completed!");
-  }
 
   // 모든 schedule 목록 조회
   @GetMapping("/all_schedules")
@@ -99,6 +92,7 @@ public class ScheduleApiController {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("the schedule is not found");
     }else{
+      // dto에 입력된 값만 수정
       if(request.getScheduleName()!=null){
         target.setScheduleName(request.getScheduleName());
       }
