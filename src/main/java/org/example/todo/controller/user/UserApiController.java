@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.domain.UserEntity;
+import org.example.todo.dto.mapper.UserMapper;
 import org.example.todo.dto.user.UserAddRequest;
 import org.example.todo.dto.user.UserResponse;
 import org.example.todo.dto.user.UserUpdateRequest;
@@ -28,22 +29,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user/api")
-@Tag(name = "User management")
-@ApiResponses({
-    @ApiResponse(responseCode = "200", description = "success"),
-    @ApiResponse(responseCode = "201", description = "successfully add the record"),
-    @ApiResponse(responseCode = "404", description = "the resource is not found")
-})
-public class UserApiController {
+public class UserApiController implements UserApiSpec{
 
   private final UserService userService;
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final UserMapper userMapper;
 
-  @Operation(
-      summary = "find all user list for normal user",
-      description = "view the particular fields of the user(except password)"
-  )
+
   @GetMapping("/all")
   public ResponseEntity<?> findAllUsers() {
     List<UserResponse> result = userService.findAll();
@@ -53,10 +46,6 @@ public class UserApiController {
   }
 
 
-  @Operation(
-      summary = "find the user by id",
-      description = "view Id, Name, Email"
-  )
   @GetMapping("/{user_id}")
   public ResponseEntity<?> findUserById(
       @PathVariable(name = "user_id", required = true) Long user_id
@@ -89,15 +78,27 @@ public class UserApiController {
       @PathVariable(name = "user_id", required = true) Long user_id,
       @RequestBody UserUpdateRequest request
   ) {
-    UserResponse target = userService.findById(user_id);
+    UserEntity target = userService.findByIdAndReturnUserEntity(user_id);
 
     if (target == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("the user is not found");
     }
 
+    if(request.getUserName()!=null){
+      target.setUserName(request.getUserName());
+    }
+
+    if(request.getUserEmail()!=null){
+      target.setUserEmail(request.getUserEmail());
+    }
+
+    if(request.getUserPassword()!=null){
+      target.setUserPassword(bCryptPasswordEncoder.encode(request.getUserPassword()));
+    }
+
     return ResponseEntity.status(HttpStatus.OK)
-        .body(target);
+        .body(userMapper.toResponse(target));
   }
 
 
@@ -105,12 +106,14 @@ public class UserApiController {
   public ResponseEntity<?> deleteUser(
       @PathVariable(name = "user_id", required = true) Long user_id
   ) {
+    if(userService.findById(user_id)==null){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body("the user is not found");
+    }
+
     userService.deleteById(user_id);
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(null);
   }
-
-
-
 }

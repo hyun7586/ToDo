@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.todo.config.jwt.TokenProvider;
 import org.example.todo.domain.RefreshToken;
 import org.example.todo.domain.UserEntity;
 import org.example.todo.dto.user.UserAddRequest;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class UserLoginController {
+public class UserAuthController implements UserAuthSpec{
 
   private final UserService userService;
   private final TokenService tokenService;
