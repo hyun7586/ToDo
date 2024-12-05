@@ -23,6 +23,11 @@ public class WebSecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/login", "/signup").permitAll()
             .requestMatchers("/user/api/modify_for_admin").permitAll()
+            .requestMatchers(
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/webjars/**").permitAll()
             .anyRequest().authenticated())
 //        .formLogin(formlogin -> formlogin
 //            // html에 쓰인 input field의 name 값과 usernameParameter 명이 맞아야 loadUserByUsername()
@@ -41,7 +46,7 @@ public class WebSecurityConfig {
   @Bean
   public AuthenticationManager authenticationManager(HttpSecurity http,
       // UserDetailsService(interface)가 아니라 UserDetailService!!
-       // 위 interface를 구현한, 내가 커스텀한 UserDetailService 객체를 전달해야 함.
+      // 위 interface를 구현한, 내가 커스텀한 UserDetailService 객체를 전달해야 함.
       BCryptPasswordEncoder bCryptPasswordEncoder, UserDetailService userService)
       throws Exception {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
