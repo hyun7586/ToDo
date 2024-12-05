@@ -16,6 +16,8 @@ public class TokenApiController {
 
   private final TokenService tokenService;
 
+  // 주어진 경로로 refreshToken을 주면 accessToken 발급을 요청하는 api
+  // parameter로 주어진 request에는 String refreshToken field만 존재함.
   @PostMapping("/api/token")
   public ResponseEntity<CreateAccessTokenResponse> createNewAccessToken
       (@RequestBody CreateAccessTokenRequest request) {
