@@ -7,7 +7,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -26,13 +28,17 @@ public class TokenProvider {
 
   private final JwtProperties jwtProperties;
 
-  public String generateToken(UserEntity user, Duration expiredAt) {
-    Date now = new Date();
-
-    return makeToken(new Date(now.getTime() + expiredAt.toMillis()), user);
+  private Key getSecretKey() {
+    return Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8)));
   }
 
-  public String makeToken(Date expiry, UserEntity user) {
+  public String generateToken(UserEntity user, Duration expiryDuration) {
+    Date now = new Date();
+
+    return makeToken(new Date(now.getTime() + expiryDuration.toMillis()), user);
+  }
+
+  public String makeToken(Date expiredAt, UserEntity user) {
     Date now = new Date();
 
     return Jwts.builder()
@@ -40,9 +46,9 @@ public class TokenProvider {
         .setSubject(user.getUserEmail())
         .setIssuer(jwtProperties.getIssuer())
         .setIssuedAt(now)
-        .setExpiration(expiry)
+        .setExpiration(expiredAt)
         .claim("id", user.getUserId())
-        .signWith(SignatureAlgorithm.HS256,jwtProperties.getSecretKey())
+        .signWith(SignatureAlgorithm.HS256, getSecretKey())
         .compact();
   }
 
@@ -50,8 +56,7 @@ public class TokenProvider {
   public boolean validToken(String token) {
     try {
       Jwts.parserBuilder()
-          .setSigningKey(
-              Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8)))
+          .setSigningKey(getSecretKey())
           .build()
           .parseClaimsJws(token);
 
@@ -71,15 +76,16 @@ public class TokenProvider {
         token, authorities);
   }
 
-  public Long getUserId(String token){
+  public Long getUserId(String token) {
     Claims claims = getClaims(token);
 
     return claims.get("id", Long.class);
   }
 
+  // String type의 token을 복호화해서 body를 추출하는 method
   private Claims getClaims(String token) {
     return Jwts.parserBuilder()
-        .setSigningKey(Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8)))
+        .setSigningKey(getSecretKey())
         .build()
         .parseClaimsJws(token)
         .getBody();

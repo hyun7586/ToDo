@@ -45,6 +45,10 @@ public class UserService {
     return userRepository.findById(id).orElse(null);
   }
 
+  public UserEntity findByEmailAndReturnUserEntity(String email){
+    return userRepository.findByUserEmail(email).orElse(null);
+  }
+
   // save the user
   public Long save(UserAddRequest request){
     return userRepository.save(UserEntity.builder()
