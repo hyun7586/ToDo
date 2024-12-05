@@ -7,7 +7,7 @@
 
   <style>
     .gradient-custom {
-      background: linear-gradient(to right, rgba(254, 238, 229, 1), rgba(229, 193, 197, 1))
+      background: linear-gradient(to right, rgb(215, 217, 224), rgb(146, 158, 158))
     }
   </style>
 </head>
@@ -23,6 +23,10 @@
           <form th:action="@{/signup}" method="POST">
             <!-- 토큰을 추가하여 CSRF 공격 방지 -->
             <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
+            <div class="mb-3">
+              <label class="form-label text-white">Username</label>
+              <input type="text" class="form-control" name="username">
+            </div>
             <div class="mb-3">
               <label class="form-label text-white">Email address</label>
               <input type="email" class="form-control" name="email">

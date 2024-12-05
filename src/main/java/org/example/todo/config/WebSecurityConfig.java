@@ -16,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
@@ -23,13 +24,13 @@ public class WebSecurityConfig {
             .requestMatchers("/login", "/signup").permitAll()
             .requestMatchers("/user/api/modify_for_admin").permitAll()
             .anyRequest().authenticated())
-        .formLogin(formlogin -> formlogin
-            // html에 쓰인 input field의 name 값과 usernameParameter 명이 맞아야 loadUserByUsername()
-            // method에 올바르게 argument가 전달됨
-            .usernameParameter("email")
-            .loginProcessingUrl("/login")
-            .defaultSuccessUrl("/main")
-            .loginPage("/login"))
+//        .formLogin(formlogin -> formlogin
+//            // html에 쓰인 input field의 name 값과 usernameParameter 명이 맞아야 loadUserByUsername()
+//            // method에 올바르게 argument가 전달됨
+//            .usernameParameter("email")
+//            .loginProcessingUrl("/login")
+//            .defaultSuccessUrl("/main")
+//            .loginPage("/login"))
         .logout(logout -> logout
             .logoutSuccessUrl("/login")
             .invalidateHttpSession(true))
