@@ -18,7 +18,7 @@ public class UserViewController {
     return "signup";
   }
 
-  @GetMapping("/main")
+  @GetMapping("/mainPage")
   public String mainPage(){
     return "mainPage";
   }
