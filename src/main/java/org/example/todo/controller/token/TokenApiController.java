@@ -1,6 +1,9 @@
 package org.example.todo.controller.token;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.example.todo.dto.token.CreateAccessTokenRequest;
 import org.example.todo.dto.token.CreateAccessTokenResponse;
 import org.example.todo.service.token.TokenService;
@@ -12,20 +15,35 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class TokenApiController {
 
   private final TokenService tokenService;
 
-  // 주어진 경로로 refreshToken을 주면 accessToken 발급을 요청하는 api
-  // parameter로 주어진 request에는 String refreshToken field만 존재함.
   @PostMapping("/api/token")
-  public ResponseEntity<CreateAccessTokenResponse> createNewAccessToken
+  public ResponseEntity<?> createNewAccessToken
       (@RequestBody CreateAccessTokenRequest request) {
-    String newAccessToken = tokenService.createNewAccessToken(request.getRefreshToken());
+    try {
+      String newAccessToken = tokenService.createNewAccessToken(request.getRefreshToken());
 
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CreateAccessTokenResponse.builder()
-            .accessToken(newAccessToken)
-            .build());
+      // tokenService.createNewAccessToken()이 null을 return하는 경우는 없긴 함.
+      if(newAccessToken==null){
+        log.error("you are cooked!: tokenService.createNewAccessToken() return null");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body("error: tokenService.createNewAccessToken() return null");
+      }
+
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(CreateAccessTokenResponse.builder()
+              .accessToken(newAccessToken)
+              .build());
+
+    } catch(ExpiredJwtException e){
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body("the refresh token is expired. Please login again.");
+    } catch(Exception e){
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body("Unexpected Exception: "+e.getMessage());
+    }
   }
 }

@@ -1,5 +1,6 @@
 package org.example.todo.service.token;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -20,22 +21,30 @@ public class TokenService {
   private final UserService userService;
   private final JwtProperties jwtProperties;
 
-  public String createNewAccessToken(String refreshToken){
+  public String createNewAccessToken(String refreshToken) {
 
-    if(!tokenProvider.validToken(refreshToken)){
-      log.info("Secret Key: {}", jwtProperties.getSecretKey());
-      throw new IllegalArgumentException("Unexpected token");
+    try {
+      if (tokenProvider.validToken(refreshToken)) {
+
+        Long userId = tokenProvider.getUserId(refreshToken);
+        UserEntity user = userService.findByIdAndReturnUserEntity(userId);
+
+        return tokenProvider.generateToken(user, Duration.ofHours(2));
+      }
+    } catch (ExpiredJwtException e) {
+      log.error("RefreshToken is expired");
+      throw e;
+    } catch (Exception e) {
+      log.error("Unexpected Exception: {}", e.getMessage());
+      throw e;
     }
 
-    // find userId, User
-    Long userId = tokenProvider.getUserId(refreshToken);
-    UserEntity user = userService.findByIdAndReturnUserEntity(userId);
-
-    // generate Access Token by the information found before
-    return tokenProvider.generateToken(user, Duration.ofHours(2));
+    // tokenProvider.validToken()은 true를 return하지 않으면 반드시 Exception을 발생시켜 위에서 catch되기
+    // 때문에 아래 return null을 수행하지는 않을 거임.
+    return null;
   }
 
-  public String createNewRefreshToken(UserEntity user){
+  public String createNewRefreshToken(UserEntity user) {
     return tokenProvider.generateToken(user, Duration.ofDays(2));
   }
 
