@@ -30,6 +30,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
   private final static String HEADER_AUTHORIZATION = "Authorization";
   private final static String TOKEN_PREFIX = "Bearer ";
 
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    String requestUrl = request.getRequestURI();
+    return requestUrl.equals("/login") || requestUrl.equals("/signup");
+  }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
