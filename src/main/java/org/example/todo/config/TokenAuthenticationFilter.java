@@ -32,8 +32,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-    String requestUrl = request.getRequestURI();
-    return requestUrl.equals("/login") || requestUrl.equals("/signup");
+    String requestUri = request.getRequestURI();
+    log.debug("request.getRequestURI: {}", requestUri);
+    log.debug("equals? {}", requestUri.equals("/login"));
+    return requestUri.equals("/login")
+        || requestUri.equals("/signup")
+        || requestUri.equals("/favicon.ico");
   }
 
   @Override
@@ -44,7 +48,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     String accessToken = getAccessToken(authorizationHeader);
 
     try {
-      if(tokenProvider.validToken(accessToken)) {
+      if (tokenProvider.validToken(accessToken)) {
 
         Authentication authentication = tokenProvider.getAuthentication(accessToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -63,7 +67,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       response.setStatus(HttpStatus.FORBIDDEN.value());
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
-      response.getWriter().write("Unexpected Exception: "+e.getMessage());
+      response.getWriter().write("Unexpected Exception: " + e.getMessage());
     }
 
     if (SecurityContextHolder.getContext().getAuthentication() == null) {
