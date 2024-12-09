@@ -10,6 +10,7 @@ import org.example.todo.domain.RefreshToken;
 import org.example.todo.domain.UserEntity;
 import org.example.todo.dto.user.UserAddRequest;
 import org.example.todo.repository.RefreshTokenRepository;
+import org.example.todo.service.token.RefreshTokenService;
 import org.example.todo.service.token.TokenService;
 import org.example.todo.service.user.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +31,7 @@ public class UserAuthController implements UserAuthSpec {
 
   private final UserService userService;
   private final TokenService tokenService;
-  private final RefreshTokenRepository refreshTokenRepository;
+  private final RefreshTokenService refreshTokenService;
   private final AuthenticationManager authenticationManager;
 
   @PostMapping("/login")
@@ -40,6 +41,8 @@ public class UserAuthController implements UserAuthSpec {
       Model model
   ) {
     try {
+      // token들이 만료되지 않은 사용자가 재로그인하더라도 그냥 토큰 둘 다 새로 발급
+
       // 1. 사용자 인증 시도
       UsernamePasswordAuthenticationToken authenticationToken =
           new UsernamePasswordAuthenticationToken(email, password);
@@ -49,18 +52,27 @@ public class UserAuthController implements UserAuthSpec {
       // 2. 사용자 entity 조회
       UserEntity user = userService.findByEmailAndReturnUserEntity(email);
 
-      // 해당 사용자에게 토큰이 없는 경우에만 새로 발급하는 로직 추가해야 함
+      if(user==null){
+        log.error("the user is not found");
+        return "redirect:/login?error=true";
+      }
 
       // 3. 토근 발급
       String refreshToken = tokenService.createNewRefreshToken(user);
       String accessToken = tokenService.createNewAccessToken(refreshToken);
 
-      // 4. accessToken은 client에 return
-      model.addAttribute("accessToken", accessToken);
+      // 4. accessToken log
       log.info("accessToken: {}", accessToken);
 
-      // 5. refreshToken은 DB에 저장
-      refreshTokenRepository.save(new RefreshToken(user.getUserId(), refreshToken));
+      // 5. 변경된 refreshToken 정보로 기존 refreshToken을 update or 새로 저장
+      RefreshToken target = refreshTokenService.findByUserId(user.getUserId());
+      if(target==null){
+        log.info("new refresh Token saved! {}",refreshTokenService.save(new RefreshToken(user.getUserId(), refreshToken)));
+      } else{
+        target.setRefreshToken(refreshToken);
+        log.info("original token is updated! {}",refreshTokenService.save(target));
+      }
+
 
       // 6. 로그인 성공 시 main page로 redirect
       return "redirect:/mainPage";
