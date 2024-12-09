@@ -1,10 +1,14 @@
 package org.example.todo.config.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -14,6 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.todo.domain.UserEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TokenProvider {
 
   private final JwtProperties jwtProperties;
@@ -61,8 +67,12 @@ public class TokenProvider {
           .parseClaimsJws(token);
 
       return true;
-    } catch (Exception e) {
-      return false;
+    } catch(ExpiredJwtException e){
+      log.error("Expired Jwt Token: 만료된 토큰입니다.");
+      throw e;
+    } catch(Exception e){
+      log.error("Unexpected exception: {}", e.getMessage());
+      throw e;
     }
   }
 
