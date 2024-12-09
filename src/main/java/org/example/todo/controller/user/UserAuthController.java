@@ -2,6 +2,8 @@ package org.example.todo.controller.user;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.sql.Ref;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todo.domain.RefreshToken;
@@ -24,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class UserAuthController implements UserAuthSpec{
+public class UserAuthController implements UserAuthSpec {
 
   private final UserService userService;
   private final TokenService tokenService;
@@ -47,27 +49,29 @@ public class UserAuthController implements UserAuthSpec{
       // 2. 사용자 entity 조회
       UserEntity user = userService.findByEmailAndReturnUserEntity(email);
 
-      // 3. 토큰 발급
+      // 해당 사용자에게 토큰이 없는 경우에만 새로 발급하는 로직 추가해야 함
+
+      // 3. 토근 발급
       String refreshToken = tokenService.createNewRefreshToken(user);
       String accessToken = tokenService.createNewAccessToken(refreshToken);
 
       // 4. accessToken은 client에 return
       model.addAttribute("accessToken", accessToken);
+      log.info("accessToken: {}", accessToken);
 
       // 5. refreshToken은 DB에 저장
       refreshTokenRepository.save(new RefreshToken(user.getUserId(), refreshToken));
 
       // 6. 로그인 성공 시 main page로 redirect
       return "redirect:/mainPage";
-    } catch (Exception e){
+    } catch (Exception e) {
 
       // 6. 로그인 실패 처리
-       model.addAttribute("error", "Invalid email or password");
-       return "redirect:/login?error=true";
+      model.addAttribute("error", "Invalid email or password");
+      return "redirect:/login?error=true";
     }
   }
 
-  // login, signup, logout
   @PostMapping("/signup")
   public String signUpUser(
       @RequestParam String username,
