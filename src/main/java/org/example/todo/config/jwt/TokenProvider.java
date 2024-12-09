@@ -71,7 +71,7 @@ public class TokenProvider {
       log.error("Expired Jwt Token: 만료된 토큰입니다.");
       throw e;
     } catch(Exception e){
-      log.error("Unexpected exception: {}", e.getMessage());
+      log.error("Unexpected exception in validToken(): {}", e.getMessage());
       throw e;
     }
   }
