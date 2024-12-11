@@ -48,6 +48,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
 
     String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
+
+    // Authorization 헤더가 없는 경우 바로 필터 체인 진행
+    if (authorizationHeader == null || !authorizationHeader.startsWith(TOKEN_PREFIX)) {
+      log.debug("Authorization header is empty or AuthorizationHeader doesn't start with TOKEN_PREFIX");
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     String accessToken = getAccessToken(authorizationHeader);
 
     try {
