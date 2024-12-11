@@ -1,6 +1,8 @@
 package org.example.todo.controller.schedule;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.domain.ScheduleEntity;
 import org.example.todo.dto.schedule.ScheduleAddRequest;
@@ -147,4 +149,37 @@ public class ScheduleApiController implements ScheduleApiSpec{
     return ResponseEntity.status(HttpStatus.OK)
         .body("the delete is completed");
   }
+
+  // 날짜별 정렬 기능
+  @GetMapping("/sort/{level}")
+  public ResponseEntity<?> sortByDate(
+      @PathVariable(name="level") String level
+  ){
+    LocalDateTime now = LocalDateTime.now();
+    List<ScheduleEntity> result;
+
+    LocalDateTime upperLimit = switch(level){
+      case "month" -> now.plusMonths(1);
+      case "week" -> now.plusWeeks(1);
+      case "day" -> now.plusDays(1);
+      default -> null;
+    };
+
+    if(upperLimit==null){
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body("Invalid level: "+level);
+    }
+
+    result = scheduleService.findAll().stream()
+        .filter(each -> each.getScheduleStartDate().isAfter(now) &&
+            each.getScheduleEndDate().isBefore(now) &&
+            each.getScheduleEndDate().isBefore(upperLimit))
+        .toList();
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(result);
+  }
+
+  // paging
+
 }

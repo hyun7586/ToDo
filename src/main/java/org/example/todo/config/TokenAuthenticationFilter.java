@@ -35,7 +35,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     String requestUri = request.getRequestURI();
     log.debug("request.getRequestURI: {}", requestUri);
     log.debug("equals? {}", requestUri.equals("/login"));
-    return requestUri.equals("/login")
+    return requestUri.startsWith("/swagger-ui")
+        || requestUri.startsWith("/swagger-resources")
+        || requestUri.startsWith("/v3/api-docs")
+        || requestUri.equals("/login")
         || requestUri.equals("/signup")
         || requestUri.equals("/favicon.ico");
   }
@@ -45,6 +48,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
 
     String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
+
+    // Authorization 헤더가 없는 경우 바로 필터 체인 진행
+    if (authorizationHeader == null || !authorizationHeader.startsWith(TOKEN_PREFIX)) {
+      log.debug("Authorization header is empty or AuthorizationHeader doesn't start with TOKEN_PREFIX");
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     String accessToken = getAccessToken(authorizationHeader);
 
     try {
@@ -62,12 +73,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
       response.getWriter().write("AccessToken is expired: AccessToken 재발급이 필요합니다.");
+      return;
     } catch (Exception e) {
       // ExpiredJwtException 외 다른 Exception들을 받아서 처리하는 로직 필요
       response.setStatus(HttpStatus.FORBIDDEN.value());
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
       response.getWriter().write("Unexpected Exception: " + e.getMessage());
+      return;
     }
 
     if (SecurityContextHolder.getContext().getAuthentication() == null) {
