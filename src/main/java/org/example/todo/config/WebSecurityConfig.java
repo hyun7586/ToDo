@@ -32,9 +32,11 @@ public class WebSecurityConfig {
                 "/signup",
                 "/user/api/modify_for_admin",
                 "/error",
+                // swagger 설정을 위한 관련 경로는 아래 3가지임
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
                 "/swagger-resources/**",
+
                 "/webjars/**").permitAll()
             .requestMatchers("/mainPage").hasAuthority("ROLE_USER")
             .anyRequest().authenticated())

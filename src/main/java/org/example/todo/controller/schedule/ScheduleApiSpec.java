@@ -84,4 +84,17 @@ public interface ScheduleApiSpec {
   ResponseEntity<?> deleteSchedule(
       @Parameter(description = "일정 id")
       Long schedule_id);
+
+  @Operation(
+      summary = "특정 기준에 따른 일정 조회",
+      description = "parameter로 전달된 일정 기준(month, week, day)에 따라 일정 조회"
+  )
+  @ApiResponses(value={
+      @ApiResponse(responseCode = "200", description = "조회 성공"),
+      @ApiResponse(responseCode = "400", description = "level 입력값 잘못됨")
+  })
+  ResponseEntity<?> sortByDate(
+      @Parameter(description = "조회 기준(month, week, day)")
+      String level);
 }
+
