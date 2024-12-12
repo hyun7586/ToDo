@@ -48,4 +48,11 @@ public class TokenService {
     return tokenProvider.generateToken(user, Duration.ofDays(2));
   }
 
+  // generateToken for admin
+  // it can be user to generate refresh/accessToken
+  public String createNewTokenAdmin(UserEntity user, Duration duration){
+    return tokenProvider.generateToken(user, duration);
+  }
+
+
 }
