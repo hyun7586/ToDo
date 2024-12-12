@@ -9,6 +9,7 @@ import org.example.todo.dto.schedule.ScheduleAddRequest;
 import org.example.todo.dto.schedule.ScheduleUpdateRequest;
 import org.example.todo.dto.schedule.ScheduleViewResponse;
 import org.example.todo.service.schedule.ScheduleService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -181,5 +183,14 @@ public class ScheduleApiController implements ScheduleApiSpec{
   }
 
   // paging
+  @GetMapping("/pages")
+  public ResponseEntity<?> getSchedulePages(
+      @RequestParam Integer page,
+      @RequestParam Integer size
+  ){
+    Page<ScheduleEntity> result = scheduleService.getSchedulePages(page, size);
 
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(result);
+  }
 }

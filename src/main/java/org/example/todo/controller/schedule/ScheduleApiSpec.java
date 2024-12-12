@@ -96,5 +96,20 @@ public interface ScheduleApiSpec {
   ResponseEntity<?> sortByDate(
       @Parameter(description = "조회 기준(month, week, day)")
       String level);
+
+
+  @Operation(
+      summary = "schedule 목록 page 조회 기능",
+      description = "param으로 주어진 page, size에 따라 schedule 목록 조회"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "조회 성공")
+  })
+  ResponseEntity<?> getSchedulePages(
+      @Parameter(description = "조회할 page number(0부터 시작)") Integer page,
+      @Parameter(description = "한 page에 들어갈 schedule 개수") Integer size
+  );
+
+
 }
 
