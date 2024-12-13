@@ -6,9 +6,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.example.todo.dto.user.UserAddRequest;
 import org.example.todo.dto.user.UserRequest;
-import org.example.todo.dto.user.UserUpdateRequest;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "User Api", description = "기본적인 user CRUD 기능을 구현한 Api")
