@@ -15,7 +15,7 @@ public interface UserAuthSpec {
       summary = "user login",
       description = "사용자 인증, 토큰 발급, mainPage redirect까지 담당하는 api"
   )
-  ResponseEntity<?> login(String email, String password, Model model);
+  ResponseEntity<?> login(String email, String password);
 
   @Operation(
       summary = "user signup",
