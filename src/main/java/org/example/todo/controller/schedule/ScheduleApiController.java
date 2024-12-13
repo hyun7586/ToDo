@@ -2,7 +2,6 @@ package org.example.todo.controller.schedule;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.domain.ScheduleEntity;
 import org.example.todo.dto.schedule.ScheduleAddRequest;
@@ -25,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/schedule/api")
-public class ScheduleApiController implements ScheduleApiSpec{
+public class ScheduleApiController implements ScheduleApiSpec {
 
   private final ScheduleService scheduleService;
 
   // 모든 schedule 목록 조회
   @GetMapping("/all_schedules")
-  public ResponseEntity<?> getAllSchedule(){
+  public ResponseEntity<?> getAllSchedule() {
     List<ScheduleEntity> scheduleList = scheduleService.findAll();
 
     return ResponseEntity.status(HttpStatus.OK)
@@ -42,10 +41,10 @@ public class ScheduleApiController implements ScheduleApiSpec{
   @GetMapping("/schedule/{schedule_id}")
   public ResponseEntity<?> getSchedule(
       @PathVariable(name = "schedule_id") Long schedule_id
-  ){
+  ) {
     ScheduleEntity temp = scheduleService.findById(schedule_id);
 
-    if(temp==null){
+    if (temp == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("the schedule is not found");
     } else {
@@ -67,7 +66,7 @@ public class ScheduleApiController implements ScheduleApiSpec{
   @PostMapping("/schedule")
   public ResponseEntity<?> addSchedule(
       @RequestBody ScheduleAddRequest request
-  ){
+  ) {
     ScheduleEntity temp = ScheduleEntity.builder()
         .scheduleName(request.getScheduleName())
         .scheduleMemo(request.getScheduleMemo())
@@ -76,7 +75,6 @@ public class ScheduleApiController implements ScheduleApiSpec{
         .scheduleCategory(request.getScheduleCategory())
         .scheduleStatus("Not Started")
         .build();
-    
 
     ScheduleEntity result = scheduleService.save(temp);
 
@@ -87,29 +85,29 @@ public class ScheduleApiController implements ScheduleApiSpec{
   // 특정 일정정보 수정
   @PatchMapping("/schedule/{schedule_id}")
   public ResponseEntity<?> updateSchedule(
-      @PathVariable(name="schedule_id") Long schedule_id,
+      @PathVariable(name = "schedule_id") Long schedule_id,
       @RequestBody ScheduleUpdateRequest request
-  ){
+  ) {
     ScheduleEntity target = scheduleService.findById(schedule_id);
 
-    if(target==null){
+    if (target == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("the schedule is not found");
-    }else{
+    } else {
       // dto에 입력된 값만 수정
-      if(request.getScheduleName()!=null){
+      if (request.getScheduleName() != null) {
         target.setScheduleName(request.getScheduleName());
       }
-      if(request.getScheduleMemo()!=null){
+      if (request.getScheduleMemo() != null) {
         target.setScheduleMemo(request.getScheduleMemo());
       }
-      if(request.getScheduleStartDate()!=null){
+      if (request.getScheduleStartDate() != null) {
         target.setScheduleStartDate(request.getScheduleStartDate());
       }
-      if(request.getScheduleEndDate()!=null){
+      if (request.getScheduleEndDate() != null) {
         target.setScheduleEndDate(request.getScheduleEndDate());
       }
-      if(request.getScheduleCategory()!=null){
+      if (request.getScheduleCategory() != null) {
         target.setScheduleCategory(request.getScheduleCategory());
       }
 
@@ -123,11 +121,11 @@ public class ScheduleApiController implements ScheduleApiSpec{
   // 특정 일정 완료 처리
   @PatchMapping("/schedule/complete/{schedule_id}")
   public ResponseEntity<?> completeSchedule(
-      @PathVariable(name="schedule_id") Long schedule_id
-  ){
+      @PathVariable(name = "schedule_id") Long schedule_id
+  ) {
     ScheduleEntity target = scheduleService.findById(schedule_id);
 
-    if(target==null){
+    if (target == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("the schedule is not found");
     }
@@ -141,9 +139,9 @@ public class ScheduleApiController implements ScheduleApiSpec{
   // 특정 일정 삭제
   @DeleteMapping("/schedule/{schedule_id}")
   public ResponseEntity<?> deleteSchedule(
-      @PathVariable(name="schedule_id") Long schedule_id
-  ){
-    if(scheduleService.findById(schedule_id)==null){
+      @PathVariable(name = "schedule_id") Long schedule_id
+  ) {
+    if (scheduleService.findById(schedule_id) == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("the schedule is not found");
     }
@@ -155,21 +153,21 @@ public class ScheduleApiController implements ScheduleApiSpec{
   // 날짜별 정렬 기능
   @GetMapping("/sort/{level}")
   public ResponseEntity<?> sortByDate(
-      @PathVariable(name="level") String level
-  ){
+      @PathVariable(name = "level") String level
+  ) {
     LocalDateTime now = LocalDateTime.now();
     List<ScheduleEntity> result;
 
-    LocalDateTime upperLimit = switch(level){
+    LocalDateTime upperLimit = switch (level) {
       case "month" -> now.plusMonths(1);
       case "week" -> now.plusWeeks(1);
       case "day" -> now.plusDays(1);
       default -> null;
     };
 
-    if(upperLimit==null){
+    if (upperLimit == null) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-          .body("Invalid level: "+level);
+          .body("Invalid level: " + level);
     }
 
     result = scheduleService.findAll().stream()
@@ -187,7 +185,7 @@ public class ScheduleApiController implements ScheduleApiSpec{
   public ResponseEntity<?> getSchedulePages(
       @RequestParam Integer page,
       @RequestParam Integer size
-  ){
+  ) {
     Page<ScheduleEntity> result = scheduleService.getSchedulePages(page, size);
 
     return ResponseEntity.status(HttpStatus.OK)
