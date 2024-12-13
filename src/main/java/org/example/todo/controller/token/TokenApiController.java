@@ -1,9 +1,7 @@
 package org.example.todo.controller.token;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.example.todo.dto.token.CreateAccessTokenRequest;
 import org.example.todo.dto.token.CreateAccessTokenResponse;
 import org.example.todo.service.token.TokenService;
@@ -23,27 +21,18 @@ public class TokenApiController {
   @PostMapping("/api/token")
   public ResponseEntity<?> createNewAccessToken
       (@RequestBody CreateAccessTokenRequest request) {
-    try {
-      String newAccessToken = tokenService.createNewAccessToken(request.getRefreshToken());
+    String newAccessToken = tokenService.createNewAccessToken(request.getRefreshToken());
 
-      // tokenService.createNewAccessToken()이 null을 return하는 경우는 없긴 함.
-      if(newAccessToken==null){
-        log.error("you are cooked!: tokenService.createNewAccessToken() return null");
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body("error: tokenService.createNewAccessToken() return null");
-      }
-
-      return ResponseEntity.status(HttpStatus.CREATED)
-          .body(CreateAccessTokenResponse.builder()
-              .accessToken(newAccessToken)
-              .build());
-
-    } catch(ExpiredJwtException e){
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body("the refresh token is expired. Please login again.");
-    } catch(Exception e){
+    // tokenService.createNewAccessToken()이 null을 return하는 경우는 없긴 함.
+    if (newAccessToken == null) {
+      log.error("you are cooked!: tokenService.createNewAccessToken() return null");
       return ResponseEntity.status(HttpStatus.FORBIDDEN)
-          .body("Unexpected Exception: "+e.getMessage());
+          .body("error: tokenService.createNewAccessToken() return null");
     }
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(CreateAccessTokenResponse.builder()
+            .accessToken(newAccessToken)
+            .build());
   }
 }

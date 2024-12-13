@@ -4,6 +4,7 @@ package org.example.todo.exception;
 import io.jsonwebtoken.JwtException;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.todo.controller.user.UserAdminController;
 import org.example.todo.controller.user.UserAuthController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice(basePackageClasses = {UserAuthController.class})
-public class UserAuthExceptionHandler {
+@RestControllerAdvice(basePackages = "org.example.todo.controller.user")
+public class UserExceptionHandler {
 
   @ExceptionHandler(value={NoSuchElementException.class, NullPointerException.class})
   public ResponseEntity<?> noElementHandler(
@@ -54,5 +55,5 @@ public class UserAuthExceptionHandler {
         .body("Unexpected Exception: "+e.getMessage());
   }
 
-
 }
+

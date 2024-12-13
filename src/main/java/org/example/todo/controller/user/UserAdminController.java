@@ -15,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,31 +36,26 @@ public class UserAdminController {
       @RequestParam String password,
       @RequestParam Integer expiryDays
   ) {
-    try {
-      UsernamePasswordAuthenticationToken authenticationToken =
-          new UsernamePasswordAuthenticationToken(email, password);
-      Authentication authentication = authenticationManager.authenticate(authenticationToken);
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+    UsernamePasswordAuthenticationToken authenticationToken =
+        new UsernamePasswordAuthenticationToken(email, password);
+    Authentication authentication = authenticationManager.authenticate(authenticationToken);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-      UserEntity user = userService.findByEmailAndReturnUserEntity(email);
+    UserEntity user = userService.findByEmailAndReturnUserEntity(email);
 
-      String refreshToken = tokenService.createNewTokenAdmin(user, Duration.ofDays(expiryDays));
-      String accessToken = tokenService.createNewTokenAdmin(user, Duration.ofDays(expiryDays));
+    String refreshToken = tokenService.createNewTokenAdmin(user, Duration.ofDays(expiryDays));
+    String accessToken = tokenService.createNewTokenAdmin(user, Duration.ofDays(expiryDays));
 
-      RefreshToken target = refreshTokenService.findByUserId(user.getUserId());
-      if (target == null) {
-        log.info("new refresh Token: {}",
-            refreshTokenService.save(new RefreshToken(user.getUserId(), refreshToken)));
-      } else {
-        target.setRefreshToken(refreshToken);
-        log.info("the refresh token is updated: {}", refreshTokenService.save(target));
-      }
-
-      return ResponseEntity.status(HttpStatus.OK)
-          .body(accessToken);
-    } catch(Exception e){
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-          .body("Unexpected Exception: "+ e.getMessage());
+    RefreshToken target = refreshTokenService.findByUserId(user.getUserId());
+    if (target == null) {
+      log.info("new refresh Token: {}",
+          refreshTokenService.save(new RefreshToken(user.getUserId(), refreshToken)));
+    } else {
+      target.setRefreshToken(refreshToken);
+      log.info("the refresh token is updated: {}", refreshTokenService.save(target));
     }
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(accessToken);
   }
 }
