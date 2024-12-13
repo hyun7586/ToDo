@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.example.todo.dto.user.UserAddRequest;
+import org.example.todo.dto.user.UserRequest;
 import org.example.todo.dto.user.UserUpdateRequest;
 import org.springframework.http.ResponseEntity;
 
@@ -43,7 +44,7 @@ public interface UserApiSpec {
   })
   ResponseEntity<?> addUser(
       @Parameter(description = "user name, email, password")
-      UserAddRequest request);
+      UserRequest request);
 
   @Operation(
       summary = "user 정보 변경",
@@ -57,7 +58,7 @@ public interface UserApiSpec {
       @Parameter(description = "변경하고자 하는 user id")
       Long user_id,
       @Parameter(description = "user name, email, password")
-      UserUpdateRequest request);
+      UserRequest request);
 
   @Operation(
       summary = "user 삭제",

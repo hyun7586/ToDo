@@ -5,8 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.example.todo.dto.schedule.ScheduleAddRequest;
-import org.example.todo.dto.schedule.ScheduleUpdateRequest;
+import org.example.todo.dto.schedule.ScheduleRequest;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 
@@ -44,7 +43,7 @@ public interface ScheduleApiSpec {
   })
   ResponseEntity<?> addSchedule(
       @Parameter(description = "일정 name, content, startedAt, endedAt, category")
-      ScheduleAddRequest request);
+      ScheduleRequest request);
 
   @Operation(
       summary = "특정 일정 정보 수정",
@@ -58,7 +57,7 @@ public interface ScheduleApiSpec {
       @Parameter(description = "일정 id")
       Long schedule_id,
       @Parameter(description = "일정 name, content, startedAt, endedAt, category 중 수정사항")
-      ScheduleUpdateRequest request);
+      ScheduleRequest request);
 
   @Operation(
       summary = "특정 일정 완료 처리",
