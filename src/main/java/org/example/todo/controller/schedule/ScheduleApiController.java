@@ -30,7 +30,7 @@ public class ScheduleApiController implements ScheduleApiSpec {
   private final ScheduleMapper scheduleMapper;
 
   // 모든 schedule 목록 조회
-  @GetMapping("/all_schedules")
+  @GetMapping("/all")
   public ResponseEntity<?> getAllSchedule() {
     List<ScheduleResponse> scheduleList = scheduleService.findAll().stream()
         .map(scheduleMapper::toResponse)
@@ -41,7 +41,7 @@ public class ScheduleApiController implements ScheduleApiSpec {
   }
 
   // 특정 일정 id로 조회
-  @GetMapping("/schedule/{schedule_id}")
+  @GetMapping("/{schedule_id}")
   public ResponseEntity<?> getSchedule(
       @PathVariable(name = "schedule_id") Long schedule_id
   ) {
@@ -59,7 +59,7 @@ public class ScheduleApiController implements ScheduleApiSpec {
   }
 
   // 일정 추가
-  @PostMapping("/schedule")
+  @PostMapping("/post")
   public ResponseEntity<?> addSchedule(
       @RequestBody ScheduleRequest request
   ) {
@@ -70,7 +70,7 @@ public class ScheduleApiController implements ScheduleApiSpec {
   }
 
   // 특정 일정정보 수정
-  @PatchMapping("/schedule/{schedule_id}")
+  @PatchMapping("/{schedule_id}")
   public ResponseEntity<?> updateSchedule(
       @PathVariable(name = "schedule_id") Long schedule_id,
       @RequestBody ScheduleRequest request
@@ -106,7 +106,7 @@ public class ScheduleApiController implements ScheduleApiSpec {
   }
 
   // 특정 일정 완료 처리
-  @PatchMapping("/schedule/complete/{schedule_id}")
+  @PatchMapping("/complete/{schedule_id}")
   public ResponseEntity<?> completeSchedule(
       @PathVariable(name = "schedule_id") Long schedule_id
   ) {
@@ -124,7 +124,7 @@ public class ScheduleApiController implements ScheduleApiSpec {
   }
 
   // 특정 일정 삭제
-  @DeleteMapping("/schedule/{schedule_id}")
+  @DeleteMapping("/{schedule_id}")
   public ResponseEntity<?> deleteSchedule(
       @PathVariable(name = "schedule_id") Long schedule_id
   ) {

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/view")
+@RequestMapping("/schedule/view")
 public class ScheduleViewController {
 
   @GetMapping("/main")
