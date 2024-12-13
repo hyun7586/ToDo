@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.domain.UserEntity;
 import org.example.todo.dto.mapper.UserMapper;
-import org.example.todo.dto.user.UserAddRequest;
+import org.example.todo.dto.user.UserRequest;
 import org.example.todo.dto.user.UserResponse;
 import org.example.todo.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,14 +19,9 @@ public class UserService {
 
   // find all
   public List<UserResponse> findAll(){
-    List<UserEntity> temp = userRepository.findAll();
-
-    return temp.stream()
-        .map((each) -> UserResponse.builder()
-            .userId(each.getUserId())
-            .userName(each.getUsername())
-            .userEmail(each.getUserEmail())
-            .build()).toList();
+    return userRepository.findAll().stream()
+        .map(usermapper::toResponse)
+        .toList();
   }
 
   // find the user by id and return UserResponse
@@ -50,7 +45,7 @@ public class UserService {
   }
 
   // save the user
-  public Long save(UserAddRequest request){
+  public Long save(UserRequest request){
     return userRepository.save(UserEntity.builder()
         .userEmail(request.getUserEmail())
         .userPassword(bCryptPasswordEncoder.encode(request.getUserPassword()))
@@ -61,8 +56,5 @@ public class UserService {
   // delete the user
   public void deleteById(Long id){
     userRepository.deleteById(id);
-    return;
   }
-
-
 }

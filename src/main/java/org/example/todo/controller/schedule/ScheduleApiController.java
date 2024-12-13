@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.todo.domain.ScheduleEntity;
-import org.example.todo.dto.schedule.ScheduleAddRequest;
-import org.example.todo.dto.schedule.ScheduleUpdateRequest;
-import org.example.todo.dto.schedule.ScheduleViewResponse;
+import org.example.todo.dto.mapper.ScheduleMapper;
+import org.example.todo.dto.schedule.ScheduleRequest;
+import org.example.todo.dto.schedule.ScheduleResponse;
 import org.example.todo.service.schedule.ScheduleService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -27,11 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScheduleApiController implements ScheduleApiSpec {
 
   private final ScheduleService scheduleService;
+  private final ScheduleMapper scheduleMapper;
 
   // 모든 schedule 목록 조회
   @GetMapping("/all_schedules")
   public ResponseEntity<?> getAllSchedule() {
-    List<ScheduleEntity> scheduleList = scheduleService.findAll();
+    List<ScheduleResponse> scheduleList = scheduleService.findAll().stream()
+        .map(scheduleMapper::toResponse)
+        .toList();
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(scheduleList);
@@ -45,48 +48,32 @@ public class ScheduleApiController implements ScheduleApiSpec {
     ScheduleEntity temp = scheduleService.findById(schedule_id);
 
     if (temp == null) {
+
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("the schedule is not found");
     } else {
-      ScheduleViewResponse result = ScheduleViewResponse.builder()
-          .scheduleId(temp.getScheduleId())
-          .scheduleName(temp.getScheduleName())
-          .scheduleMemo(temp.getScheduleMemo())
-          .scheduleStartDate(temp.getScheduleStartDate())
-          .scheduleEndDate(temp.getScheduleEndDate())
-          .scheduleCategory(temp.getScheduleCategory())
-          .build();
 
       return ResponseEntity.status(HttpStatus.OK)
-          .body(result);
+          .body(scheduleMapper.toResponse(temp));
     }
   }
 
   // 일정 추가
   @PostMapping("/schedule")
   public ResponseEntity<?> addSchedule(
-      @RequestBody ScheduleAddRequest request
+      @RequestBody ScheduleRequest request
   ) {
-    ScheduleEntity temp = ScheduleEntity.builder()
-        .scheduleName(request.getScheduleName())
-        .scheduleMemo(request.getScheduleMemo())
-        .scheduleStartDate(request.getScheduleStartDate())
-        .scheduleEndDate(request.getScheduleEndDate())
-        .scheduleCategory(request.getScheduleCategory())
-        .scheduleStatus("Not Started")
-        .build();
-
-    ScheduleEntity result = scheduleService.save(temp);
+    ScheduleEntity saved = scheduleService.save(scheduleMapper.toEntity(request));
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(result);
+        .body(saved);
   }
 
   // 특정 일정정보 수정
   @PatchMapping("/schedule/{schedule_id}")
   public ResponseEntity<?> updateSchedule(
       @PathVariable(name = "schedule_id") Long schedule_id,
-      @RequestBody ScheduleUpdateRequest request
+      @RequestBody ScheduleRequest request
   ) {
     ScheduleEntity target = scheduleService.findById(schedule_id);
 
@@ -156,8 +143,6 @@ public class ScheduleApiController implements ScheduleApiSpec {
       @PathVariable(name = "level") String level
   ) {
     LocalDateTime now = LocalDateTime.now();
-    List<ScheduleEntity> result;
-
     LocalDateTime upperLimit = switch (level) {
       case "month" -> now.plusMonths(1);
       case "week" -> now.plusWeeks(1);
@@ -170,10 +155,11 @@ public class ScheduleApiController implements ScheduleApiSpec {
           .body("Invalid level: " + level);
     }
 
-    result = scheduleService.findAll().stream()
+    List<ScheduleResponse> result = scheduleService.findAll().stream()
         .filter(each -> each.getScheduleStartDate().isAfter(now) &&
             each.getScheduleEndDate().isBefore(now) &&
             each.getScheduleEndDate().isBefore(upperLimit))
+        .map(scheduleMapper::toResponse)
         .toList();
 
     return ResponseEntity.status(HttpStatus.OK)
@@ -186,7 +172,8 @@ public class ScheduleApiController implements ScheduleApiSpec {
       @RequestParam Integer page,
       @RequestParam Integer size
   ) {
-    Page<ScheduleEntity> result = scheduleService.getSchedulePages(page, size);
+    Page<ScheduleEntity> temp = scheduleService.getSchedulePages(page, size);
+    Page<ScheduleResponse> result = temp.map(scheduleMapper::toResponse);
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(result);

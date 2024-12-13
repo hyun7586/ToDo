@@ -1,18 +1,14 @@
 package org.example.todo.controller.user;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.example.todo.domain.ScheduleEntity;
 import org.example.todo.domain.UserEntity;
 import org.example.todo.dto.mapper.UserMapper;
-import org.example.todo.dto.user.UserAddRequest;
+import org.example.todo.dto.user.UserRequest;
 import org.example.todo.dto.user.UserResponse;
-import org.example.todo.dto.user.UserUpdateRequest;
-import org.example.todo.repository.UserRepository;
+import org.example.todo.service.schedule.ScheduleService;
 import org.example.todo.service.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +25,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user/api")
-public class UserApiController implements UserApiSpec{
+public class UserApiController implements UserApiSpec {
 
   private final UserService userService;
-  private final UserRepository userRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final UserMapper userMapper;
 
+  @GetMapping("/modify_for_admin")
+  public ResponseEntity<?> modify_for_admin() {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body("modify_for_admin(): this method is empty now");
+  }
 
   @GetMapping("/all")
   public ResponseEntity<?> findAllUsers() {
@@ -48,7 +48,7 @@ public class UserApiController implements UserApiSpec{
 
   @GetMapping("/{user_id}")
   public ResponseEntity<?> findUserById(
-      @PathVariable(name = "user_id", required = true) Long user_id
+      @PathVariable(name = "user_id") Long user_id
   ) {
     UserResponse target = userService.findById(user_id);
 
@@ -64,7 +64,7 @@ public class UserApiController implements UserApiSpec{
 
   @PostMapping("/post")
   public ResponseEntity<?> addUser(
-      @RequestBody UserAddRequest request
+      @RequestBody UserRequest request
   ) {
     Long target = userService.save(request);
 
@@ -75,8 +75,8 @@ public class UserApiController implements UserApiSpec{
 
   @PatchMapping("/update/{user_id}")
   public ResponseEntity<?> updateUser(
-      @PathVariable(name = "user_id", required = true) Long user_id,
-      @RequestBody UserUpdateRequest request
+      @PathVariable(name = "user_id") Long user_id,
+      @RequestBody UserRequest request
   ) {
     UserEntity target = userService.findByIdAndReturnUserEntity(user_id);
 
@@ -85,15 +85,15 @@ public class UserApiController implements UserApiSpec{
           .body("the user is not found");
     }
 
-    if(request.getUserName()!=null){
+    if (request.getUserName() != null) {
       target.setUserName(request.getUserName());
     }
 
-    if(request.getUserEmail()!=null){
+    if (request.getUserEmail() != null) {
       target.setUserEmail(request.getUserEmail());
     }
 
-    if(request.getUserPassword()!=null){
+    if (request.getUserPassword() != null) {
       target.setUserPassword(bCryptPasswordEncoder.encode(request.getUserPassword()));
     }
 
@@ -104,9 +104,9 @@ public class UserApiController implements UserApiSpec{
 
   @DeleteMapping("/delete/{user_id}")
   public ResponseEntity<?> deleteUser(
-      @PathVariable(name = "user_id", required = true) Long user_id
+      @PathVariable(name = "user_id") Long user_id
   ) {
-    if(userService.findById(user_id)==null){
+    if (userService.findById(user_id) == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("the user is not found");
     }

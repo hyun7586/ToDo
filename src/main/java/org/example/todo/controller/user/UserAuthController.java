@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.todo.domain.RefreshToken;
 import org.example.todo.domain.UserEntity;
-import org.example.todo.dto.user.UserAddRequest;
+import org.example.todo.dto.user.UserRequest;
 import org.example.todo.service.token.RefreshTokenService;
 import org.example.todo.service.token.TokenService;
 import org.example.todo.service.user.UserService;
@@ -73,13 +73,11 @@ public class UserAuthController implements UserAuthSpec {
       @RequestParam String email,
       @RequestParam String password
   ) {
-    UserAddRequest user = UserAddRequest.builder()
+    Long savedId = userService.save(UserRequest.builder()
         .userEmail(email)
         .userName(username)
         .userPassword(password)
-        .build();
-
-    Long savedId = userService.save(user);
+        .build());
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(savedId);

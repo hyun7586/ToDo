@@ -11,14 +11,13 @@ import lombok.Setter;
 @Setter
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ScheduleAddResponse {
+public class ScheduleResponse {
+
   private Long scheduleId;
   private String scheduleName;
   private String scheduleMemo;
-
   private LocalDateTime scheduleStartDate;;
   private LocalDateTime scheduleEndDate;
-
   private String status;
   private String scheduleCategory;
 
