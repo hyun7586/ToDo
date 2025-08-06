@@ -79,7 +79,7 @@
 ---
 ### **📃API 명세서**
 
-[API 명세서 notion](https://positive-woolen-1a2.notion.site/API-1468835a50908034b0dad91e2f7cc1c8?pvs=4)
+[API 명세서 notion](https://positive-woolen-1a2.notion.site/API-1ee8835a509081b48508e4695be8770f?source=copy_link)
 
 
 
